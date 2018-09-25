@@ -1,0 +1,60 @@
+<html>
+<head>
+    <title>TODO List</title>
+    <meta charset="UTF-8">
+    <style>
+        span.deleteCross {
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>TodoList</h1>
+    <ul id="todoList">
+
+    </ul>
+    <form>
+        <label for="newTodo">Add a newTodo? </label>
+        <input type="text" name="newTodo" id="newTodo" autofocus />
+        <input type="button" value="Add" onclick="addTodo()" />
+    </form>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+        var socket = io();
+        var pseudo;
+
+        
+        socket.on('update todolist', function (todolist) {
+            var index = 0;
+
+            $("#todoList").empty();
+
+            todolist.forEach((todo) => {
+                $("#todoList").append("<li><span class='deleteCross' onclick='deleteTodo(" + index + ")'>Delete  </span> " + todo + "</li>");
+                index++;
+            }
+            );
+        });
+
+
+        function deleteTodo(index) {
+            socket.emit('delete todo', index);
+
+            document.getElementById('newTodo').value = ""
+        }
+
+
+        function addTodo() {
+            $('form').submit(false);
+            var newTodo = document.getElementById('newTodo').value
+            socket.emit("add todo", newTodo);
+
+            document.getElementById('newTodo').value = ""
+        }
+    </script>
+</body>
+</html>
